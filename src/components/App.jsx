@@ -1,60 +1,54 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useState } from 'react';
 import { Notification } from './Notification';
 import { FeedbackButtons } from './FeedbackButtons';
 import { FeedbackSection } from './Section';
 import { FeedbackStats } from './Stats';
- export class Feedback extends Component{
-state = {
-    good: 0,
-    neutral: 0,
-    bad: 0
-  }
-  handleTotalFeedbackCount = () =>{
-    const {good, bad, neutral} = this.state;
-    const total = good + neutral + bad;
-    return total;
-  }
-  handlePositiveFeedbackPercentage = () => {
-    const { good, bad, neutral} = this.state;
-    const total = good + neutral + bad;
+ export const Feedback = ()=> {
+  const [feedback, setFeedback] = useState({good: 0, neutral: 0, bad: 0,});
+
+  const { good, neutral, bad } = feedback;
+
+  const total = good + neutral + bad;
+
+  const countPercentage = () => {
     let percentage = (good / total)*100;
-    return Math.round(percentage) ; 
-  }
-   handleFeedback = option => {
-    this.setState(prevState => {
-      return {
-        [option]: prevState[option] + 1,
-      };
-    });
+    return Math.round(percentage); 
   };
-render(){
-  const { good, bad, neutral} = this.state;
-  const total = this.handleTotalFeedbackCount();
-  const percentage = this.handlePositiveFeedbackPercentage();
-  const AppOptions = Object.keys(this.state);
+
+  const onHandleFeedback = option => {
+    setFeedback(prevFeedback => ({
+      ...prevFeedback,
+      [option]: prevFeedback[option] + 1,
+    }));
+  };
+
+  const options = Object.keys(feedback);
+
+ 
   return (
     <div>
-    <FeedbackSection title = {"Please leave your feedback"}>
-    <FeedbackButtons
-      options = {AppOptions} handleFeedback ={this.handleFeedback}
-    />
-    </FeedbackSection>
-    <FeedbackSection title = {"Statistics"}>
-    {total > 0 ? (
-       <FeedbackStats
-       good={good} 
-       bad={bad} 
-       neutral={neutral} 
-       total={total} 
-       percentage= {percentage}
-       />
-    ):(
-      <Notification
-      message = {"There is no feedback"}
+      <FeedbackSection title = {"Please leave your feedback"}>
+      <FeedbackButtons
+        options = {options} handleFeedback ={onHandleFeedback}
       />
-    )};
-    </FeedbackSection>
+      </FeedbackSection>
+      <FeedbackSection title = {"Statistics"}>
+      {total > 0 ? (
+        <FeedbackStats
+        good={good} 
+        bad={bad} 
+        neutral={neutral} 
+        total={total} 
+        percentage= {countPercentage()}
+        />
+      ):(
+        <Notification
+        message = {"There is no feedback"}
+        />
+      )};
+      </FeedbackSection>
     </div>
   );
-}
-}
+ };
+
